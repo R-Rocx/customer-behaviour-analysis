@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChurnLens — Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#03060f;--accent:#6366f1;--accent2:#22d3ee;--accent3:#a855f7;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--border:rgba(99,120,200,.15);--border2:rgba(99,120,200,.3);}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;}
+.scene{position:fixed;inset:0;z-index:0;}
+.glow{position:absolute;border-radius:50%;filter:blur(100px);opacity:.15;pointer-events:none;}
+.g1{width:600px;height:600px;background:radial-gradient(#a855f7,transparent);top:-150px;right:-100px;animation:drift 12s ease-in-out infinite alternate;}
+.g2{width:500px;height:500px;background:radial-gradient(#6366f1,transparent);bottom:-100px;left:-100px;animation:drift 9s ease-in-out infinite alternate-reverse;}
+@keyframes drift{to{transform:translate(40px,30px);}}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(99,120,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,120,255,.04) 1px,transparent 1px);background-size:50px 50px;}
+
+.login-wrap{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{width:440px;background:rgba(8,12,28,.88);border:1px solid var(--border);border-radius:24px;padding:44px;backdrop-filter:blur(30px);box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 80px rgba(168,85,247,.08);animation:cardIn .6s cubic-bezier(.34,1.56,.64,1);}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+.brand{text-align:center;margin-bottom:28px;}
+.brand-icon{width:52px;height:52px;border-radius:14px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent3),var(--accent));display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 0 30px rgba(168,85,247,.4);}
+.brand h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;}
+.brand p{font-size:13px;color:var(--text3);margin-top:4px;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 -44px 24px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;}
+.input-wrap{position:relative;}
+.input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;opacity:.6;}
+.form-input{width:100%;padding:11px 13px 11px 38px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:all .25s;}
+.form-input:focus{border-color:var(--accent3);background:rgba(168,85,247,.06);box-shadow:0 0 0 3px rgba(168,85,247,.1);}
+.form-input::placeholder{color:var(--text3);}
+.btn-reg{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,var(--accent3),var(--accent));border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;}
+.btn-reg:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(168,85,247,.4);}
+.login-footer{text-align:center;font-size:13px;color:var(--text3);margin-top:20px;}
+.login-footer a{color:var(--accent);text-decoration:none;font-weight:600;}
+.strength-bar{height:3px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:6px;overflow:hidden;}
+.strength-fill{height:100%;border-radius:3px;transition:width .4s,background .4s;width:0%;}
+</style>
+</head>
+<body style="background:#03060f;color:#f1f5f9;">
+<div class="scene">
+  <div class="grid-bg"></div>
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+</div>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon">✨</div>
+      <h1>Create Account</h1>
+      <p>Join the ChurnLens platform today</p>
+    </div>
+    <div class="divider"></div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input class="form-input" placeholder="First name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input class="form-input" placeholder="Last name">
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <div class="input-wrap">
+        <span class="input-icon">@</span>
+        <input class="form-input" placeholder="Choose a username">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <div class="input-wrap">
+        <span class="input-icon">✉️</span>
+        <input class="form-input" type="email" placeholder="your@email.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input class="form-input" type="password" id="passInput" placeholder="Create a strong password" oninput="checkStrength(this.value)">
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="sFill"></div></div>
+    </div>
+    <button class="btn-reg" onclick="location.href='/'">Create Account →</button>
+    <div class="login-footer">Already have an account? <a href="/">Sign in</a></div>
+  </div>
+</div>
+<script>
+function checkStrength(v){
+  const f=document.getElementById('sFill');
+  let s=0;
+  if(v.length>6)s+=25;if(v.length>10)s+=25;if(/[A-Z]/.test(v))s+=25;if(/[0-9!@#$]/.test(v))s+=25;
+  f.style.width=s+'%';
+  f.style.background=s<=25?'#ef4444':s<=50?'#f59e0b':s<=75?'#3b82f6':'#10b981';
+}
+</script>
+</body>
+</html>

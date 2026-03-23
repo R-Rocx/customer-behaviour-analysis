@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChurnLens — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#03060f;--card:rgba(12,18,35,0.9);
+  --accent:#6366f1;--accent2:#22d3ee;--accent3:#a855f7;
+  --green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --border:rgba(99,120,200,0.15);--border2:rgba(99,120,200,0.3);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;}
+.scene{position:fixed;inset:0;z-index:0;}
+canvas#bg{position:absolute;inset:0;width:100%;height:100%;}
+.glow{position:absolute;border-radius:50%;filter:blur(100px);opacity:.18;pointer-events:none;}
+.g1{width:700px;height:700px;background:radial-gradient(#6366f1,transparent);top:-200px;left:-150px;animation:drift 10s ease-in-out infinite alternate;}
+.g2{width:600px;height:600px;background:radial-gradient(#a855f7,transparent);bottom:-150px;right:-100px;animation:drift 14s ease-in-out infinite alternate-reverse;}
+.g3{width:400px;height:400px;background:radial-gradient(#22d3ee,transparent);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse2 6s ease-in-out infinite;}
+@keyframes drift{to{transform:translate(60px,40px);}}
+@keyframes pulse2{0%,100%{opacity:.12}50%{opacity:.2}}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(99,120,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,120,255,.04) 1px,transparent 1px);background-size:50px 50px;}
+
+.login-wrap{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{
+  width:420px;
+  background:rgba(8,12,28,0.85);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:44px;
+  backdrop-filter:blur(30px);
+  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 80px rgba(99,102,241,.08);
+  animation:cardIn .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+.brand{text-align:center;margin-bottom:36px;}
+.brand-icon{
+  width:58px;height:58px;border-radius:16px;margin:0 auto 14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  box-shadow:0 0 30px rgba(99,102,241,.5),0 0 60px rgba(99,102,241,.15);
+  animation:iconPulse 3s ease-in-out infinite;
+}
+@keyframes iconPulse{0%,100%{box-shadow:0 0 30px rgba(99,102,241,.5)}50%{box-shadow:0 0 50px rgba(99,102,241,.8),0 0 80px rgba(99,102,241,.3)}}
+.brand h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px;}
+.brand h1 span{background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.brand p{font-size:13px;color:var(--text3);margin-top:5px;letter-spacing:.3px;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 -44px 28px;}
+
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px;}
+.input-wrap{position:relative;}
+.input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.6;}
+.form-input{
+  width:100%;padding:12px 14px 12px 40px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:12px;color:var(--text);
+  font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;transition:all .25s;
+}
+.form-input:focus{border-color:var(--accent);background:rgba(99,102,241,.06);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+.form-input::placeholder{color:var(--text3);}
+.forgot{display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:6px;}
+.forgot a{font-size:12px;color:var(--accent2);text-decoration:none;}
+.btn-login{
+  width:100%;padding:13px;margin-top:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  border:none;border-radius:12px;color:#fff;
+  font-size:15px;font-weight:700;font-family:'Inter',sans-serif;
+  cursor:pointer;transition:all .25s;letter-spacing:.3px;
+  position:relative;overflow:hidden;
+}
+.btn-login::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);opacity:0;transition:opacity .2s;}
+.btn-login:hover::before{opacity:1;}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(99,102,241,.4);}
+.btn-login:active{transform:translateY(0);}
+.login-footer{text-align:center;font-size:13px;color:var(--text3);margin-top:22px;}
+.login-footer a{color:var(--accent);text-decoration:none;font-weight:600;}
+.demo-hint{
+  margin-top:16px;padding:10px 14px;
+  background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.15);
+  border-radius:10px;font-size:12px;color:var(--text3);text-align:center;
+}
+.demo-hint code{color:var(--accent2);font-family:monospace;font-size:13px;}
+.error-msg{display:none;margin-top:10px;padding:10px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;color:#fc8181;text-align:center;}
+</style>
+</head>
+<body style="background:#03060f;color:#f1f5f9;">
+<div class="scene">
+  <canvas id="bg"></canvas>
+  <div class="grid-bg"></div>
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+  <div class="glow g3"></div>
+</div>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <h1>Churn<span>IQ</span></h1>
+      <p>Customer Intelligence Platform</p>
+    </div>
+    <div class="divider"></div>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input class="form-input" id="uname" placeholder="Enter your username" value="admin">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input class="form-input" id="upass" type="password" placeholder="Enter your password" value="admin">
+      </div>
+    </div>
+    <div class="forgot"><a href="#">Forgot password?</a></div>
+    <div id="errMsg" class="error-msg">Invalid credentials. Try admin / admin</div>
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+    <div class="demo-hint">Demo: <code>admin</code> / <code>admin</code></div>
+    <div class="login-footer">Don't have an account? <a href="/register">Create one</a></div>
+  </div>
+</div>
+
+<script>
+// Particle canvas bg
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;init();}
+function init(){
+  particles=[];
+  for(let i=0;i<80;i++) particles.push({
+    x:Math.random()*W, y:Math.random()*H,
+    vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+    r:Math.random()*1.5+.5, a:Math.random()*.5+.1,
+    c:`hsl(${220+Math.random()*60},70%,70%)`
+  });
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;
+    if(p.y<0||p.y>H)p.vy*=-1;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();
+  });
+  // connections
+  ctx.globalAlpha=1;
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){
+        ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(99,102,241,${.08*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+}
+window.addEventListener('resize',resize);resize();draw();
+
+function doLogin(){
+  const u=document.getElementById('uname').value;
+  const p=document.getElementById('upass').value;
+  if(u==='admin'&&p==='admin'){
+    document.querySelector('.login-card').style.animation='cardOut .4s ease forwards';
+    setTimeout(()=>location.href='/dashboard',400);
+  } else {
+    document.getElementById('errMsg').style.display='block';
+    document.querySelector('.login-card').style.animation='shake .4s ease';
+    setTimeout(()=>document.querySelector('.login-card').style.animation='',400);
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+const style=document.createElement('style');
+style.textContent='@keyframes cardOut{to{opacity:0;transform:scale(.95) translateY(-20px)}} @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

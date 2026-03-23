@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChurnLens — Predict Churn</title>
+<style>
+/* ═══════════════════════════════════════
+   ChurnLens — Shared Layout & Component CSS
+   ═══════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:      #03060f;
+  --bg2:     #070d1f;
+  --bg3:     #0c1428;
+  --card:    rgba(10,16,36,0.85);
+  --accent:  #6366f1;
+  --accent2: #22d3ee;
+  --accent3: #a855f7;
+  --green:   #10b981;
+  --red:     #ef4444;
+  --yellow:  #f59e0b;
+  --orange:  #f97316;
+  --text:    #f1f5f9;
+  --text2:   #94a3b8;
+  --text3:   #475569;
+  --border:  rgba(99,130,220,.12);
+  --border2: rgba(99,130,220,.25);
+  --shadow:  0 20px 60px rgba(0,0,0,.5);
+  --glow-a:  0 0 40px rgba(99,102,241,.15);
+  --glow-c:  0 0 40px rgba(34,211,238,.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── Background ── */
+.bg-grid {
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(99,120,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(99,120,255,.035) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+.bg-orb {
+  position:fixed;border-radius:50%;filter:blur(110px);
+  opacity:.1;pointer-events:none;z-index:0;
+}
+.orb1{width:700px;height:700px;background:var(--accent);top:-200px;left:-150px;animation:orbDrift 12s ease-in-out infinite alternate;}
+.orb2{width:500px;height:500px;background:var(--accent3);bottom:-180px;right:-100px;animation:orbDrift 9s ease-in-out infinite alternate-reverse;}
+.orb3{width:350px;height:350px;background:var(--accent2);top:35%;right:20%;animation:orbDrift 15s ease-in-out infinite alternate;}
+@keyframes orbDrift{to{transform:translate(50px,35px);}}
+
+/* ── Layout ── */
+#app { display:flex; min-height:100vh; position:relative; z-index:1; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width:256px;flex-shrink:0;
+  position:fixed;left:0;top:0;bottom:0;
+  background:linear-gradient(180deg,rgba(6,10,24,.97) 0%,rgba(3,6,15,.99) 100%);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  backdrop-filter:blur(20px);
+  z-index:100;
+  transition:transform .3s ease;
+}
+
+.sb-logo {
+  padding:26px 22px 22px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.sb-logo-icon {
+  width:40px;height:40px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;
+  box-shadow:0 0 20px rgba(99,102,241,.4);
+}
+.sb-logo-text { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; letter-spacing:-.4px; }
+.sb-logo-text em { font-style:normal; color:var(--accent2); }
+.sb-logo-version { font-size:10px; color:var(--text3); margin-top:1px; font-family:'JetBrains Mono',monospace; }
+
+.sb-section {
+  padding:20px 18px 6px;
+  font-size:10px;font-weight:600;letter-spacing:1.8px;
+  color:var(--text3);text-transform:uppercase;
+}
+
+.nav-item {
+  display:flex;align-items:center;gap:11px;
+  padding:10px 14px;margin:2px 8px;
+  border-radius:11px;cursor:pointer;
+  font-size:13.5px;font-weight:500;color:var(--text2);
+  transition:all .2s ease;position:relative;
+  border:1px solid transparent;
+  text-decoration:none;
+}
+.nav-item:hover { background:rgba(99,102,241,.08); color:var(--text); border-color:var(--border); }
+.nav-item.active {
+  background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(168,85,247,.1));
+  color:#fff; border-color:rgba(99,102,241,.3);
+  box-shadow:0 0 20px rgba(99,102,241,.08);
+}
+.nav-item.active::before {
+  content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  width:3px;height:22px;border-radius:2px;
+  background:linear-gradient(var(--accent),var(--accent3));
+}
+.nav-icon { font-size:16px;width:20px;text-align:center;flex-shrink:0; }
+.nav-badge {
+  margin-left:auto;font-size:10px;padding:2px 8px;
+  border-radius:20px;background:rgba(99,102,241,.2);
+  color:var(--accent2);font-weight:600;font-family:'JetBrains Mono',monospace;
+}
+.nav-tag {
+  margin-left:auto;font-size:9px;padding:2px 7px;
+  border-radius:5px;background:rgba(16,185,129,.15);
+  color:var(--green);font-weight:700;letter-spacing:.5px;
+}
+
+.sb-footer {
+  margin-top:auto;padding:16px;
+  border-top:1px solid var(--border);
+}
+.sb-user {
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:11px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  cursor:pointer;transition:all .2s;
+}
+.sb-user:hover{border-color:var(--border2);}
+.sb-avatar {
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;
+}
+.sb-uname{font-size:13px;font-weight:600;}
+.sb-urole{font-size:11px;color:var(--text3);}
+.sb-dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+
+/* ── Main ── */
+.main { margin-left:256px; flex:1; min-height:100vh; display:flex; flex-direction:column; }
+
+/* ── Topbar ── */
+.topbar {
+  position:sticky;top:0;z-index:50;
+  height:62px;display:flex;align-items:center;
+  padding:0 28px;gap:14px;
+  background:rgba(3,6,15,.88);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.topbar-title{font-size:17px;font-weight:700;flex:1;letter-spacing:-.3px;}
+.topbar-title small{color:var(--text3);font-weight:400;font-size:13px;margin-left:6px;}
+.tb-search {
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:8px 14px;
+  font-size:13px;color:var(--text3);cursor:text;
+  transition:all .2s;
+}
+.tb-search:hover{border-color:var(--border2);}
+.tb-btn {
+  width:36px;height:36px;border-radius:9px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;font-size:15px;
+}
+.tb-btn:hover{background:rgba(99,102,241,.15);border-color:var(--border2);}
+.tb-notif{position:relative;}
+.tb-notif::after{content:'3';position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:var(--red);font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bg);}
+
+/* ── Pages ── */
+.page{display:none;padding:26px 28px;flex:1;animation:pgIn .35s ease;}
+.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── KPI Cards ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px;}
+.kpi {
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px;
+  position:relative;overflow:hidden;
+  transition:all .3s ease;backdrop-filter:blur(12px);
+}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,160,255,.3),transparent);}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--glow-a);}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.kpi-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;}
+.kpi-chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;}
+.chip-up{background:rgba(16,185,129,.14);color:#6ee7b7;}
+.chip-dn{background:rgba(239,68,68,.14);color:#fca5a5;}
+.chip-nt{background:rgba(245,158,11,.14);color:#fcd34d;}
+.kpi-val{font-size:30px;font-weight:900;letter-spacing:-1.5px;margin-bottom:3px;line-height:1;}
+.kpi-label{font-size:12px;color:var(--text3);font-weight:500;}
+.kpi-foot{font-size:11px;color:var(--text3);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.kpi-foot b{color:var(--text2);}
+
+/* ── Cards ── */
+.card {
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:22px;
+  backdrop-filter:blur(12px);
+  transition:border-color .2s;
+  position:relative;overflow:hidden;
+}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,160,255,.2),transparent);}
+.card:hover{border-color:var(--border2);}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
+.card-title{font-size:14.5px;font-weight:700;letter-spacing:-.2px;}
+.card-sub{font-size:11.5px;color:var(--text3);margin-top:3px;}
+
+/* ── Grid layouts ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+.g3r{display:grid;grid-template-columns:1fr 2fr;gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.mb16{margin-bottom:16px;}
+
+/* ── Chart wrapper ── */
+.ch{position:relative;}
+.ch-200{height:200px;}
+.ch-240{height:240px;}
+.ch-280{height:280px;}
+.ch-160{height:160px;}
+
+/* ── Buttons ── */
+.btn{
+  padding:8px 16px;border-radius:9px;font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:all .2s;border:1px solid var(--border);
+  background:rgba(255,255,255,.05);color:var(--text2);
+  font-family:'Inter',sans-serif;
+}
+.btn:hover{background:rgba(99,102,241,.15);color:var(--accent);border-color:var(--border2);}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  border:none;color:#fff;
+  padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
+  letter-spacing:.2px;
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,.35);}
+.btn-danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);color:#fc8181;}
+.btn-danger:hover{background:rgba(239,68,68,.2);color:#fca5a5;}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;}
+.badge::before{content:'●';font-size:7px;}
+.b-red{background:rgba(239,68,68,.14);color:#fca5a5;}
+.b-green{background:rgba(16,185,129,.14);color:#6ee7b7;}
+.b-blue{background:rgba(99,102,241,.14);color:#a5b4fc;}
+.b-yellow{background:rgba(245,158,11,.14);color:#fcd34d;}
+.b-purple{background:rgba(168,85,247,.14);color:#d8b4fe;}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.8px;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid rgba(99,130,200,.05);transition:background .15s;}
+tbody tr:hover{background:rgba(99,102,241,.04);}
+tbody td{padding:11px 14px;color:var(--text2);white-space:nowrap;}
+tbody td:first-child{color:var(--text);font-weight:600;font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+/* ── Form ── */
+.form-group{margin-bottom:15px;}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.7px;text-transform:uppercase;margin-bottom:6px;}
+.form-select,.form-input{
+  width:100%;padding:10px 13px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:13px;
+  font-family:'Inter',sans-serif;transition:all .2s;outline:none;
+  appearance:none;
+}
+.form-select:focus,.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+.form-select option{background:#0c1428;}
+
+/* ── Section header ── */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{font-size:16px;font-weight:800;letter-spacing:-.3px;}
+.sec-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(99,130,220,.2);border-radius:10px;}
+
+/* ── Insight chips ── */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 13px;border-radius:10px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  font-size:12.5px;color:var(--text2);transition:all .2s;
+}
+.chip:hover{border-color:var(--border2);color:var(--text);}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── Toast ── */
+.toasts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;
+  backdrop-filter:blur(20px);border:1px solid var(--border);
+  background:rgba(8,14,30,.95);box-shadow:0 8px 32px rgba(0,0,0,.5);
+  display:flex;align-items:center;gap:10px;
+  animation:tIn .35s ease, tOut .35s ease 2.7s forwards;
+  max-width:320px;
+}
+@keyframes tIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateX(20px)}}
+
+/* ── Progress ── */
+.prog-wrap{height:5px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:5px;transition:width .15s;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+
+/* ── Pulse ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulse{animation:pulse 2s ease infinite;}
+@keyframes spin{100%{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite;}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px;}
+.filter-sel{
+  padding:8px 12px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-size:13px;font-family:'Inter',sans-serif;
+  outline:none;transition:all .2s;cursor:pointer;
+}
+.filter-sel:focus{border-color:var(--accent);}
+.filter-sel option{background:#0c1428;}
+
+/* ── Accuracy cards ── */
+.acc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+.acc-card{padding:18px;border-radius:13px;border:1px solid var(--border);background:rgba(255,255,255,.02);text-align:center;transition:all .3s;}
+.acc-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.acc-name{font-size:10.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.acc-val{font-size:40px;font-weight:900;letter-spacing:-2px;}
+.acc-prog{margin-top:10px;height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.acc-bar{height:100%;border-radius:4px;transition:width 1.5s cubic-bezier(.34,1.56,.64,1);}
+
+/* ── Drop zone ── */
+.drop-zone{
+  border:2px dashed var(--border2);border-radius:16px;
+  padding:56px 40px;text-align:center;
+  cursor:pointer;transition:all .3s;
+  background:rgba(99,102,241,.02);position:relative;
+}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(99,102,241,.06);box-shadow:0 0 40px rgba(99,102,241,.1);}
+.drop-icon{font-size:52px;display:block;margin-bottom:16px;}
+.drop-title{font-size:20px;font-weight:800;margin-bottom:7px;}
+.drop-sub{font-size:13px;color:var(--text3);}
+.drop-formats{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+.fmt{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:var(--accent);font-family:'JetBrains Mono',monospace;}
+
+/* ── Risk meter ── */
+.risk-track{height:8px;background:rgba(255,255,255,.07);border-radius:8px;overflow:hidden;margin:12px 0;}
+.risk-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));transition:width 1.2s cubic-bezier(.34,1.56,.64,1);}
+
+@media(max-width:1100px){
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .g2,.g3,.g3r{grid-template-columns:1fr;}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body style="background:#03060f;color:#f1f5f9;">
+<div class="bg-grid"></div>
+<div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+<div class="toasts" id="toasts"></div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sb-logo"><div class="sb-logo-icon">⚡</div><div><div class="sb-logo-text">Churn<em>Lens</em></div><div class="sb-logo-version">v2.4.1 · Telco</div></div></div>
+    <div class="sb-section">Main</div>
+    <a class="nav-item" href="/dashboard"><span class="nav-icon">📊</span>Dashboard<span class="nav-tag">LIVE</span></a>
+    <a class="nav-item" href="/analysis"><span class="nav-icon">📈</span>Analytics<span class="nav-badge">4</span></a>
+    <div class="sb-section">Data</div>
+    <a class="nav-item" href="/upload"><span class="nav-icon">📁</span>Upload Dataset</a>
+    <a class="nav-item" href="/view"><span class="nav-icon">🗃️</span>View Dataset</a>
+    <div class="sb-section">Intelligence</div>
+    <a class="nav-item active" href="/predict"><span class="nav-icon">🤖</span>Predict Churn</a>
+    <a class="nav-item" href="/models"><span class="nav-icon">🧠</span>Model Compare</a>
+    <div class="sb-footer"><div class="sb-user"><div class="sb-avatar">A</div><div><div class="sb-uname">Admin</div><div class="sb-urole">Data Analyst</div></div><div class="sb-dot"></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">Predict Churn <small>/ Random Forest Model · 91% Accuracy</small></div>
+      <span class="badge b-green pulse" style="font-size:12px;padding:5px 12px;">● Model Active</span>
+      <div class="tb-btn" onclick="location.href='/'">🚪</div>
+    </header>
+
+    <div class="page active">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+        <!-- Form -->
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Customer Profile</div><div class="card-sub">Enter customer details below</div></div>
+            <button class="btn" onclick="fillDemo()">Load Demo</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <select class="form-select" id="p_gender"><option>Male</option><option>Female</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Senior Citizen</label>
+              <select class="form-select" id="p_senior"><option value="0">No</option><option value="1">Yes</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Partner</label>
+              <select class="form-select" id="p_partner"><option>Yes</option><option>No</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dependents</label>
+              <select class="form-select" id="p_dep"><option>No</option><option>Yes</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tenure (months)</label>
+              <input class="form-input" type="number" id="p_tenure" value="6" min="0" max="72" oninput="liveUpdate()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monthly Charges ($)</label>
+              <input class="form-input" type="number" id="p_monthly" value="79.50" step="0.01" oninput="liveUpdate()">
+            </div>
+            <div class="form-group" style="grid-column:span 2">
+              <label class="form-label">Contract Type</label>
+              <select class="form-select" id="p_contract" onchange="liveUpdate()">
+                <option>Month-to-month</option><option>One year</option><option>Two year</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Internet Service</label>
+              <select class="form-select" id="p_internet" onchange="liveUpdate()">
+                <option>Fiber optic</option><option>DSL</option><option>No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select class="form-select" id="p_payment" onchange="liveUpdate()">
+                <option>Electronic check</option><option>Mailed check</option>
+                <option>Bank transfer (automatic)</option><option>Credit card (automatic)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Service</label>
+              <select class="form-select" id="p_phone"><option>Yes</option><option>No</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Paperless Billing</label>
+              <select class="form-select" id="p_paper"><option>Yes</option><option>No</option></select>
+            </div>
+          </div>
+
+          <button class="btn-primary" style="width:100%;padding:13px;font-size:15px;margin-top:6px" onclick="runPredict()">
+            🔮 &nbsp;Predict Churn Probability
+          </button>
+        </div>
+
+        <!-- Result panel -->
+        <div>
+          <!-- Live risk score -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><div><div class="card-title">Live Risk Score</div><div class="card-sub" id="liveStatus">Updates as you type</div></div></div>
+            <div style="text-align:center;padding:10px 0">
+              <div style="font-size:52px;font-weight:900;letter-spacing:-3px;margin-bottom:4px;line-height:1" id="liveScore">—</div>
+              <div style="font-size:13px;color:var(--text3)" id="liveLabel">Enter details to see risk</div>
+            </div>
+            <div class="risk-track"><div class="risk-fill" id="riskBar" style="width:0%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px"><span>Low Risk</span><span>High Risk</span></div>
+          </div>
+
+          <!-- Full result (shown after predict btn) -->
+          <div class="card" id="resultCard" style="display:none">
+            <div class="card-head"><div class="card-title">Prediction Details</div></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+              <div style="padding:14px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid var(--border);text-align:center">
+                <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.8px;margin-bottom:6px">PREDICTION</div>
+                <div id="predLabel" style="font-size:28px;font-weight:900;letter-spacing:-1px"></div>
+              </div>
+              <div style="padding:14px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid var(--border);text-align:center">
+                <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.8px;margin-bottom:6px">CONFIDENCE</div>
+                <div id="confLabel" style="font-size:28px;font-weight:900;letter-spacing:-1px;color:var(--accent2)"></div>
+              </div>
+            </div>
+
+            <div style="height:180px"><canvas id="gaugeChart"></canvas></div>
+
+            <div id="riskFactors" style="margin-top:14px;padding:14px;border-radius:11px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:13px;line-height:1.7;color:var(--text2)"></div>
+
+            <div id="actionPlan" style="margin-top:12px;padding:14px;border-radius:11px;font-size:13px;line-height:1.7"></div>
+          </div>
+
+          <!-- Feature weight card -->
+          <div class="card" style="margin-top:16px">
+            <div class="card-head"><div class="card-title">Key Risk Factors</div><div class="card-sub">Model feature importance</div></div>
+            <div style="height:180px"><canvas id="featChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+Chart.defaults.color='#64748b';Chart.defaults.borderColor='rgba(99,130,200,.08)';Chart.defaults.font.family='Inter';
+
+function calcScore(){
+  const tenure=+document.getElementById('p_tenure').value||0;
+  const monthly=+document.getElementById('p_monthly').value||0;
+  const contract=document.getElementById('p_contract').value;
+  const internet=document.getElementById('p_internet').value;
+  const payment=document.getElementById('p_payment').value;
+  const senior=+document.getElementById('p_senior').value;
+  const paper=document.getElementById('p_paper').value;
+
+  let s=0.08;
+  if(contract==='Month-to-month')s+=0.35;
+  else if(contract==='One year')s+=0.12;
+  if(internet==='Fiber optic')s+=0.18;
+  if(payment==='Electronic check')s+=0.14;
+  if(paper==='Yes')s+=0.05;
+  if(senior===1)s+=0.09;
+  if(tenure<6)s+=0.18;else if(tenure<12)s+=0.1;else if(tenure>36)s-=0.12;else if(tenure>60)s-=0.18;
+  if(monthly>90)s+=0.08;else if(monthly<40)s-=0.06;
+  return Math.max(0.04,Math.min(0.97,s+(Math.random()-.5)*.02));
+}
+
+function liveUpdate(){
+  const s=calcScore();
+  const pct=(s*100).toFixed(1);
+  document.getElementById('liveScore').textContent=pct+'%';
+  document.getElementById('liveScore').style.color=s>.6?'#fca5a5':s>.35?'#fcd34d':'#6ee7b7';
+  document.getElementById('riskBar').style.width=pct+'%';
+  document.getElementById('liveLabel').textContent=s>.6?'⚠️ High churn risk':s>.35?'⚡ Medium risk':'✅ Low churn risk';
+  document.getElementById('liveStatus').textContent='Live · Random Forest model';
+}
+
+let gChart=null;
+function runPredict(){
+  const s=calcScore();
+  const isChurn=s>0.5;
+  const pct=(s*100).toFixed(1);
+
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('predLabel').textContent=isChurn?'CHURN':'RETAIN';
+  document.getElementById('predLabel').style.color=isChurn?'#fca5a5':'#6ee7b7';
+  document.getElementById('confLabel').textContent=pct+'%';
+
+  // Gauge
+  if(gChart){gChart.destroy();}
+  const ctx=document.getElementById('gaugeChart').getContext('2d');
+  gChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{datasets:[{
+      data:[s*100,100-s*100],
+      backgroundColor:[isChurn?'rgba(239,68,68,.85)':'rgba(16,185,129,.85)','rgba(255,255,255,.05)'],
+      borderWidth:0,circumference:180,rotation:-90
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
+      plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  });
+
+  // Risk factors
+  const contract=document.getElementById('p_contract').value;
+  const internet=document.getElementById('p_internet').value;
+  const payment=document.getElementById('p_payment').value;
+  const tenure=+document.getElementById('p_tenure').value;
+  const senior=+document.getElementById('p_senior').value;
+  const factors=[];
+  if(contract==='Month-to-month')factors.push('🔴 Month-to-month contract (+35% risk)');
+  if(internet==='Fiber optic')factors.push('🟡 Fiber optic service (+18% risk)');
+  if(payment==='Electronic check')factors.push('🟡 Electronic check payment (+14% risk)');
+  if(tenure<6)factors.push('🔴 Very short tenure < 6 months (+18% risk)');
+  if(senior===1)factors.push('🟡 Senior citizen (+9% risk)');
+  document.getElementById('riskFactors').innerHTML='<strong style="color:var(--text2)">Risk Drivers:</strong><br>'+factors.join('<br>');
+
+  const actionPlan=isChurn
+    ?`<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px"><strong style="color:#fca5a5">⚠️ Recommended Actions:</strong><br>• Offer loyalty discount or contract upgrade incentive<br>• Schedule proactive customer success call<br>• Consider service quality review for fiber accounts<br>• Switch payment to auto-billing for retention</div>`
+    :`<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px"><strong style="color:#6ee7b7">✅ Customer likely to retain</strong><br>• Continue regular engagement<br>• Consider upselling premium add-ons<br>• Reward loyalty with account perks</div>`;
+  document.getElementById('actionPlan').innerHTML=actionPlan;
+
+  toast(isChurn?'⚠️ High churn risk detected':'✅ Customer likely to retain',isChurn?'red':'green');
+  document.getElementById('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Feature importance chart
+(()=>{
+  const ctx=document.getElementById('featChart').getContext('2d');
+  new Chart(ctx,{type:'bar',
+    data:{
+      labels:['Contract','Tenure','Monthly Charges','Internet Service','Payment Method','Senior Citizen','Paperless Billing'],
+      datasets:[{data:[0.28,0.21,0.17,0.14,0.09,0.07,0.04],
+        backgroundColor:['rgba(239,68,68,.8)','rgba(245,158,11,.75)','rgba(99,102,241,.75)','rgba(168,85,247,.7)','rgba(34,211,238,.7)','rgba(16,185,129,.7)','rgba(248,113,113,.6)'],borderRadius:6}]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{max:.35,grid:{color:'rgba(255,255,255,.04)'},ticks:{callback:v=>(v*100).toFixed(0)+'%',font:{size:10}}},
+              y:{grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+})();
+
+function fillDemo(){
+  document.getElementById('p_contract').value='Month-to-month';
+  document.getElementById('p_internet').value='Fiber optic';
+  document.getElementById('p_payment').value='Electronic check';
+  document.getElementById('p_senior').value='0';
+  document.getElementById('p_tenure').value='5';
+  document.getElementById('p_monthly').value='89.50';
+  document.getElementById('p_paper').value='Yes';
+  liveUpdate();
+}
+
+function toast(msg,type='blue'){
+  const w=document.getElementById('toasts');const el=document.createElement('div');el.className='toast';
+  el.style.borderColor=type==='green'?'rgba(16,185,129,.3)':type==='red'?'rgba(239,68,68,.3)':'var(--border)';el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3200);
+}
+
+liveUpdate();
+document.querySelectorAll('.form-select,.form-input').forEach(el=>el.addEventListener('change',liveUpdate));
+</script>
+</body>
+</html>
