@@ -1,9 +1,3 @@
-# ============================================================
-#  ChurnLens — Flask Application
-#  Run: python app.py
-#  Open: http://127.0.0.1:5000
-# ============================================================
-
 from flask import Flask, request, jsonify, render_template, send_from_directory, redirect, url_for
 from flask_cors import CORS
 import joblib

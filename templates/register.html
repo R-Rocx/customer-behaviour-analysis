@@ -60,14 +60,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <label class="form-label">First Name</label>
         <div class="input-wrap">
           <span class="input-icon">👤</span>
-          <input class="form-input" placeholder="First name">
+          <input class="form-input" id="regFname" placeholder="First name">
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Last Name</label>
         <div class="input-wrap">
           <span class="input-icon">👤</span>
-          <input class="form-input" placeholder="Last name">
+          <input class="form-input" id="regLname" placeholder="Last name">
         </div>
       </div>
     </div>
@@ -75,14 +75,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <label class="form-label">Username</label>
       <div class="input-wrap">
         <span class="input-icon">@</span>
-        <input class="form-input" placeholder="Choose a username">
+        <input class="form-input" id="regUname" placeholder="Choose a username">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
       <div class="input-wrap">
         <span class="input-icon">✉️</span>
-        <input class="form-input" type="email" placeholder="your@email.com">
+        <input class="form-input" id="regEmail" type="email" placeholder="your@email.com">
       </div>
     </div>
     <div class="form-group">
@@ -93,7 +93,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="strength-bar"><div class="strength-fill" id="sFill"></div></div>
     </div>
-    <button class="btn-reg" onclick="location.href='/'">Create Account →</button>
+    <div id="errMsg" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:9px;font-size:13px;color:#fca5a5;text-align:center"></div>
+    <div id="sucMsg" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:9px;font-size:13px;color:#6ee7b7;text-align:center"></div>
+    <button class="btn-reg" onclick="doRegister()">Create Account →</button>
     <div class="login-footer">Already have an account? <a href="/">Sign in</a></div>
   </div>
 </div>
@@ -105,6 +107,68 @@ function checkStrength(v){
   f.style.width=s+'%';
   f.style.background=s<=25?'#ef4444':s<=50?'#f59e0b':s<=75?'#3b82f6':'#10b981';
 }
+
+function doRegister(){
+  const fname = document.getElementById('regFname').value.trim();
+  const lname = document.getElementById('regLname').value.trim();
+  const uname = document.getElementById('regUname').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass  = document.getElementById('passInput').value;
+
+  const errEl = document.getElementById('errMsg');
+  const sucEl = document.getElementById('sucMsg');
+  errEl.style.display='none';
+  sucEl.style.display='none';
+
+  // Validation
+  if(!fname){ showErr('Please enter your first name.'); return; }
+  if(!uname){ showErr('Please choose a username.'); return; }
+  if(uname.length < 3){ showErr('Username must be at least 3 characters.'); return; }
+  if(!email || !email.includes('@')){ showErr('Please enter a valid email address.'); return; }
+  if(pass.length < 6){ showErr('Password must be at least 6 characters.'); return; }
+
+  // Check if username already exists
+  const users = JSON.parse(localStorage.getItem('cl_users') || '{}');
+  if(users[uname.toLowerCase()]){
+    showErr('Username already taken. Please choose another.');
+    return;
+  }
+  // Also check if 'admin' is taken (built-in)
+  if(uname.toLowerCase() === 'admin'){
+    showErr('Username "admin" is reserved. Please choose another.');
+    return;
+  }
+
+  // Save user
+  users[uname.toLowerCase()] = {
+    fname: fname,
+    lname: lname,
+    username: uname,
+    email: email,
+    password: pass,
+    created: new Date().toISOString()
+  };
+  localStorage.setItem('cl_users', JSON.stringify(users));
+
+  // Show success, redirect to login
+  sucEl.textContent = 'Account created! Redirecting to login...';
+  sucEl.style.display = 'block';
+  document.querySelector('.btn-reg').disabled = true;
+  document.querySelector('.btn-reg').style.opacity = '0.6';
+  setTimeout(() => { location.href = '/login'; }, 1800);
+}
+
+function showErr(msg){
+  const el = document.getElementById('errMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.querySelector('.login-card').style.animation = 'shake .4s ease';
+  setTimeout(()=>document.querySelector('.login-card').style.animation='', 400);
+}
+
+const style = document.createElement('style');
+style.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}';
+document.head.appendChild(style);
 </script>
 </body>
 </html>

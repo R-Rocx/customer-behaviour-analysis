@@ -123,7 +123,7 @@ canvas#bg{position:absolute;inset:0;width:100%;height:100%;}
       </div>
     </div>
     <div class="forgot"><a href="#">Forgot password?</a></div>
-    <div id="errMsg" class="error-msg">Invalid credentials. Try admin / admin</div>
+    <div id="errMsg" class="error-msg">Invalid username or password.</div>
     <button class="btn-login" onclick="doLogin()">Sign In →</button>
     <div class="demo-hint">Demo: <code>admin</code> / <code>admin</code></div>
     <div class="login-footer">Don't have an account? <a href="/register">Create one</a></div>
@@ -171,20 +171,52 @@ function draw(){
 window.addEventListener('resize',resize);resize();draw();
 
 function doLogin(){
-  const u=document.getElementById('uname').value;
-  const p=document.getElementById('upass').value;
-  if(u==='admin'&&p==='admin'){
-    document.querySelector('.login-card').style.animation='cardOut .4s ease forwards';
-    setTimeout(()=>location.href='/dashboard',400);
-  } else {
-    document.getElementById('errMsg').style.display='block';
-    document.querySelector('.login-card').style.animation='shake .4s ease';
-    setTimeout(()=>document.querySelector('.login-card').style.animation='',400);
+  const u = document.getElementById('uname').value.trim();
+  const p = document.getElementById('upass').value;
+  const errEl = document.getElementById('errMsg');
+  errEl.style.display = 'none';
+
+  if(!u || !p){
+    showLoginErr('Please enter both username and password.');
+    return;
   }
+
+  // Check built-in admin account
+  if(u.toLowerCase() === 'admin' && p === 'admin'){
+    loginSuccess('Admin');
+    return;
+  }
+
+  // Check registered users from localStorage
+  const users = JSON.parse(localStorage.getItem('cl_users') || '{}');
+  const key = u.toLowerCase();
+  if(users[key] && users[key].password === p){
+    loginSuccess(users[key].fname || users[key].username);
+    return;
+  }
+
+  // Wrong credentials
+  showLoginErr('Invalid username or password. Check your details and try again.');
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-const style=document.createElement('style');
-style.textContent='@keyframes cardOut{to{opacity:0;transform:scale(.95) translateY(-20px)}} @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}';
+
+function loginSuccess(name){
+  // Store current user session
+  localStorage.setItem('cl_session', JSON.stringify({ name: name, time: Date.now() }));
+  document.querySelector('.login-card').style.animation = 'cardOut .4s ease forwards';
+  setTimeout(() => location.href = '/dashboard', 420);
+}
+
+function showLoginErr(msg){
+  const el = document.getElementById('errMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.querySelector('.login-card').style.animation = 'shake .4s ease';
+  setTimeout(() => document.querySelector('.login-card').style.animation = '', 420);
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+const style = document.createElement('style');
+style.textContent = '@keyframes cardOut{to{opacity:0;transform:scale(.95) translateY(-20px)}} @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}';
 document.head.appendChild(style);
 </script>
 </body>
