@@ -619,8 +619,9 @@ document.getElementById('recentTbl').innerHTML=churners.map(r=>`
   </tr>`).join('');
 
 function logout(){
-  toast('👋 Logged out');
-  setTimeout(()=>location.href='/',900);
+  localStorage.removeItem('cl_session');
+  toast('👋 Logged out successfully');
+  setTimeout(()=>location.href='/login',900);
 }
 function toast(msg,type='blue'){
   const w=document.getElementById('toasts');
@@ -628,6 +629,22 @@ function toast(msg,type='blue'){
   el.style.borderColor=type==='green'?'rgba(16,185,129,.3)':type==='red'?'rgba(239,68,68,.3)':'var(--border)';
   el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3200);
 }
+</script>
+
+<script>
+// Load logged-in user name from session
+(function(){
+  try {
+    const s = JSON.parse(localStorage.getItem('cl_session') || '{}');
+    if(s.name){
+      const el = document.querySelector('.sb-uname');
+      if(el) el.textContent = s.name;
+      // Update avatar letter
+      const av = document.querySelector('.sb-avatar');
+      if(av) av.textContent = s.name.charAt(0).toUpperCase();
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>

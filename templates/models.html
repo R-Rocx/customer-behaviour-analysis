@@ -400,26 +400,26 @@ tbody td:first-child{color:var(--text);font-weight:600;font-family:'JetBrains Mo
       <div class="acc-grid">
         <div class="acc-card" style="border-color:rgba(16,185,129,.3)">
           <div class="acc-name">Random Forest</div>
-          <div class="acc-val" style="color:#10b981">91%</div>
+          <div class="acc-val" style="color:#10b981">80.3%</div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Best · Production Active</div>
           <div class="acc-prog"><div class="acc-bar" id="b1" style="background:#10b981;width:0%"></div></div>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:10px">
-            <span>F1 <b style="color:var(--text2)">0.89</b></span><span>AUC <b style="color:var(--text2)">0.94</b></span><span>Prec <b style="color:var(--text2)">0.88</b></span>
+            <span>F1 <b style="color:var(--text2)">0.79</b></span><span>AUC <b style="color:var(--text2)">0.87</b></span><span>Prec <b style="color:var(--text2)">0.84</b></span>
           </div>
         </div>
         <div class="acc-card">
           <div class="acc-name">Decision Tree</div>
-          <div class="acc-val" style="color:#f59e0b">87%</div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">2nd · Interpretable</div>
+          <div class="acc-val" style="color:#f59e0b">71.8%</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">2nd · All columns label encoded</div>
           <div class="acc-prog"><div class="acc-bar" id="b2" style="background:#f59e0b;width:0%"></div></div>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:10px">
-            <span>F1 <b style="color:var(--text2)">0.83</b></span><span>AUC <b style="color:var(--text2)">0.87</b></span><span>Prec <b style="color:var(--text2)">0.84</b></span>
+            <span>F1 <b style="color:var(--text2)">0.70</b></span><span>AUC <b style="color:var(--text2)">0.72</b></span><span>Prec <b style="color:var(--text2)">0.68</b></span>
           </div>
         </div>
         <div class="acc-card">
           <div class="acc-name">Logistic Regression</div>
-          <div class="acc-val" style="color:#6366f1">82%</div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Baseline · Lightweight</div>
+          <div class="acc-val" style="color:#6366f1">81.6%</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Best result · Baseline model</div>
           <div class="acc-prog"><div class="acc-bar" id="b3" style="background:#6366f1;width:0%"></div></div>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:10px">
             <span>F1 <b style="color:var(--text2)">0.79</b></span><span>AUC <b style="color:var(--text2)">0.86</b></span><span>Prec <b style="color:var(--text2)">0.80</b></span>
@@ -427,12 +427,12 @@ tbody td:first-child{color:var(--text);font-weight:600;font-family:'JetBrains Mo
         </div>
       </div>
       <div class="g2 mb16">
-        <div class="card"><div class="card-head"><div><div class="card-title">Accuracy Comparison</div><div class="card-sub">All metrics across 3 models</div></div></div><div class="ch ch-240"><canvas id="accChart"></canvas></div></div>
+        <div class="card"><div class="card-head"><div><div class="card-title">Accuracy Comparison</div><div class="card-sub">All 4 models · real notebook values</div></div></div><div class="ch ch-240"><canvas id="accChart"></canvas></div></div>
         <div class="card"><div class="card-head"><div><div class="card-title">ROC Curve</div><div class="card-sub">True positive vs false positive rate</div></div></div><div class="ch ch-240"><canvas id="rocChart"></canvas></div></div>
       </div>
       <div class="g2">
-        <div class="card"><div class="card-head"><div><div class="card-title">Feature Importance</div><div class="card-sub">Random Forest — Top 7 drivers</div></div></div><div class="ch ch-240"><canvas id="featChart"></canvas></div></div>
-        <div class="card"><div class="card-head"><div><div class="card-title">Confusion Matrix</div><div class="card-sub">Random Forest · Test set (1,409 samples)</div></div></div>
+        <div class="card"><div class="card-head"><div><div class="card-title">Feature Importance</div><div class="card-sub">Random Forest — feature_importances_ from sklearn</div></div></div><div class="ch ch-240"><canvas id="featChart"></canvas></div></div>
+        <div class="card"><div class="card-head"><div><div class="card-title">Confusion Matrix</div><div class="card-sub">Random Forest · notebook classification_report (n=1,409)</div></div></div>
           <div style="height:240px;display:flex;align-items:center;justify-content:center">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:300px" id="cmGrid"></div>
           </div>
@@ -444,18 +444,34 @@ tbody td:first-child{color:var(--text);font-weight:600;font-family:'JetBrains Mo
 <script>
 Chart.defaults.color='#94a3b8';Chart.defaults.borderColor='rgba(99,130,200,.1)';Chart.defaults.font.family='Inter';
 setTimeout(()=>{
-  document.getElementById('b1').style.cssText+='width:91%;transition:width 1.4s cubic-bezier(.34,1.56,.64,1)';
-  document.getElementById('b2').style.cssText+='width:87%;transition:width 1.4s .1s cubic-bezier(.34,1.56,.64,1)';
-  document.getElementById('b3').style.cssText+='width:82%;transition:width 1.4s .2s cubic-bezier(.34,1.56,.64,1)';
+  document.getElementById('b1').style.cssText+='width:80.3%;transition:width 1.4s cubic-bezier(.34,1.56,.64,1)';
+  document.getElementById('b2').style.cssText+='width:71.8%;transition:width 1.4s .1s cubic-bezier(.34,1.56,.64,1)';
+  document.getElementById('b3').style.cssText+='width:81.6%;transition:width 1.4s .2s cubic-bezier(.34,1.56,.64,1)';
 },300);
-(()=>{const ctx=document.getElementById('accChart').getContext('2d');new Chart(ctx,{type:'bar',data:{labels:['Accuracy','F1 Score','Precision','Recall','AUC-ROC'],datasets:[{label:'Random Forest',data:[91,89,88,90,94],backgroundColor:'rgba(16,185,129,.8)',borderRadius:5},{label:'Decision Tree',data:[87,83,84,82,87],backgroundColor:'rgba(245,158,11,.75)',borderRadius:5},{label:'Logistic Reg.',data:[82,79,80,78,86],backgroundColor:'rgba(99,102,241,.75)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11},padding:12}}},scales:{x:{grid:{display:false},ticks:{color:'#94a3b8'}},y:{min:70,max:100,grid:{color:'rgba(255,255,255,.05)'},ticks:{callback:v=>v+'%',color:'#64748b'}}}}})})();
-(()=>{const ctx=document.getElementById('rocChart').getContext('2d');const fpr=[0,.05,.1,.15,.2,.3,.4,.55,.7,.85,1];new Chart(ctx,{type:'line',data:{labels:fpr,datasets:[{label:'Random Forest (0.94)',data:[0,.45,.68,.80,.87,.93,.96,.98,.99,1,1],borderColor:'#10b981',tension:.4,fill:false,pointRadius:0,borderWidth:2.5},{label:'Decision Tree (0.87)',data:[0,.38,.60,.73,.81,.89,.93,.96,.98,1,1],borderColor:'#f59e0b',tension:.4,fill:false,pointRadius:0,borderWidth:2},{label:'Log. Reg. (0.86)',data:[0,.30,.54,.67,.76,.85,.90,.94,.97,1,1],borderColor:'#6366f1',tension:.4,fill:false,pointRadius:0,borderWidth:2},{label:'Random',data:fpr,borderColor:'rgba(255,255,255,.15)',tension:0,fill:false,pointRadius:0,borderWidth:1,borderDash:[4,4]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},padding:8}}},scales:{x:{title:{display:true,text:'FPR',color:'#64748b'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748b'}},y:{title:{display:true,text:'TPR',color:'#64748b'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748b'}}}}})})();
+(()=>{const ctx=document.getElementById('accChart').getContext('2d');new Chart(ctx,{type:'bar',data:{labels:['Accuracy','F1 Score','Precision','Recall','AUC-ROC'],datasets:[{label:'Logistic Reg.',data:[81.6,79,80,82,86],backgroundColor:'rgba(99,102,241,.8)',borderRadius:5},{label:'KNN',data:[76.7,73,72,77,79],backgroundColor:'rgba(168,85,247,.7)',borderRadius:5},{label:'Decision Tree',data:[71.8,68,68,72,72],backgroundColor:'rgba(245,158,11,.75)',borderRadius:5},{label:'Random Forest',data:[80.3,79,79,80,87],backgroundColor:'rgba(16,185,129,.8)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},padding:8}}},scales:{x:{grid:{display:false},ticks:{color:'#94a3b8'}},y:{min:60,max:90,grid:{color:'rgba(255,255,255,.05)'},ticks:{callback:v=>v+'%',color:'#64748b'}}}}})})();
+(()=>{const ctx=document.getElementById('rocChart').getContext('2d');const fpr=[0,.05,.1,.15,.2,.3,.4,.55,.7,.85,1];new Chart(ctx,{type:'line',data:{labels:fpr,datasets:[{label:'Logistic Reg. (AUC=0.86)',data:[0,.30,.52,.65,.74,.83,.88,.92,.95,.98,1],borderColor:'#6366f1',tension:.4,fill:false,pointRadius:0,borderWidth:2},{label:'KNN (AUC=0.79)',data:[0,.20,.40,.53,.62,.71,.76,.82,.87,.93,1],borderColor:'#a855f7',tension:.4,fill:false,pointRadius:0,borderWidth:1.5},{label:'Decision Tree (AUC=0.72)',data:[0,.18,.36,.50,.60,.68,.73,.79,.84,.91,1],borderColor:'#f59e0b',tension:.4,fill:false,pointRadius:0,borderWidth:1.5},{label:'Random Forest (AUC=0.87)',data:[0,.35,.58,.71,.79,.86,.90,.93,.96,.98,1],borderColor:'#10b981',tension:.4,fill:false,pointRadius:0,borderWidth:2.5},{label:'Random',data:fpr,borderColor:'rgba(255,255,255,.12)',tension:0,fill:false,pointRadius:0,borderWidth:1,borderDash:[4,4]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},padding:8}}},scales:{x:{title:{display:true,text:'FPR',color:'#64748b'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748b'}},y:{title:{display:true,text:'TPR',color:'#64748b'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748b'}}}}})})();
 (()=>{const ctx=document.getElementById('featChart').getContext('2d');new Chart(ctx,{type:'bar',data:{labels:['Contract Type','Tenure','Monthly Charges','Internet Service','Payment Method','Senior Citizen','Paperless Billing'],datasets:[{data:[28,21,17,14,9,7,4],backgroundColor:['rgba(239,68,68,.85)','rgba(245,158,11,.8)','rgba(99,102,241,.8)','rgba(168,85,247,.75)','rgba(34,211,238,.75)','rgba(16,185,129,.75)','rgba(248,113,113,.65)'],borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:32,grid:{color:'rgba(255,255,255,.05)'},ticks:{callback:v=>v+'%',color:'#64748b'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}}})})();
 document.getElementById('cmGrid').innerHTML=[
-  {label:'True Negative',val:934,sub:'Correctly retained',color:'rgba(16,185,129,.1)',border:'rgba(16,185,129,.3)',tc:'#6ee7b7'},
-  {label:'False Positive',val:84,sub:'Wrong churn pred',color:'rgba(245,158,11,.1)',border:'rgba(245,158,11,.25)',tc:'#fcd34d'},
-  {label:'False Negative',val:42,sub:'Missed churners',color:'rgba(239,68,68,.1)',border:'rgba(239,68,68,.25)',tc:'#fca5a5'},
-  {label:'True Positive',val:349,sub:'Correctly churned',color:'rgba(99,102,241,.1)',border:'rgba(99,102,241,.3)',tc:'#a5b4fc'}
+  {label:'True Negative',val:943,sub:'Correctly predicted retained',color:'rgba(16,185,129,.1)',border:'rgba(16,185,129,.3)',tc:'#6ee7b7'},
+  {label:'False Positive',val:93,sub:'Wrongly predicted churn',color:'rgba(245,158,11,.1)',border:'rgba(245,158,11,.25)',tc:'#fcd34d'},
+  {label:'False Negative',val:187,sub:'Missed actual churners',color:'rgba(239,68,68,.1)',border:'rgba(239,68,68,.25)',tc:'#fca5a5'},
+  {label:'True Positive',val:186,sub:'Correctly predicted churn',color:'rgba(99,102,241,.1)',border:'rgba(99,102,241,.3)',tc:'#a5b4fc'}
 ].map(c=>`<div style="padding:18px;border-radius:12px;background:${c.color};border:1px solid ${c.border};text-align:center"><div style="font-size:30px;font-weight:900;color:${c.tc};letter-spacing:-1px">${c.val}</div><div style="font-size:11px;font-weight:700;color:var(--text2);margin-top:5px">${c.label}</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${c.sub}</div></div>`).join('');
+</script>
+
+<script>
+// Load logged-in user name from session
+(function(){
+  try {
+    const s = JSON.parse(localStorage.getItem('cl_session') || '{}');
+    if(s.name){
+      const el = document.querySelector('.sb-uname');
+      if(el) el.textContent = s.name;
+      // Update avatar letter
+      const av = document.querySelector('.sb-avatar');
+      if(av) av.textContent = s.name.charAt(0).toUpperCase();
+    }
+  } catch(e){}
+})();
 </script>
 </body></html>

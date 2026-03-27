@@ -395,7 +395,7 @@ tbody td:first-child{color:var(--text);font-weight:600;font-family:'JetBrains Mo
 
   <main class="main">
     <header class="topbar">
-      <div class="topbar-title">Predict Churn <small>/ Random Forest Model · 91% Accuracy</small></div>
+      <div class="topbar-title">Predict Churn <small>/ Logistic Regression model · 81.6% Accuracy</small></div>
       <span class="badge b-green pulse" style="font-size:12px;padding:5px 12px;">● Model Active</span>
       <div class="tb-btn" onclick="location.href='/'">📤</div>
     </header>
@@ -631,6 +631,22 @@ function toast(msg,type='blue'){
 
 liveUpdate();
 document.querySelectorAll('.form-select,.form-input').forEach(el=>el.addEventListener('change',liveUpdate));
+</script>
+
+<script>
+// Load logged-in user name from session
+(function(){
+  try {
+    const s = JSON.parse(localStorage.getItem('cl_session') || '{}');
+    if(s.name){
+      const el = document.querySelector('.sb-uname');
+      if(el) el.textContent = s.name;
+      // Update avatar letter
+      const av = document.querySelector('.sb-avatar');
+      if(av) av.textContent = s.name.charAt(0).toUpperCase();
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>

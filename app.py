@@ -1,3 +1,9 @@
+# ============================================================
+#  ChurnLens — Flask Application
+#  Run: python app.py
+#  Open: http://127.0.0.1:5000
+# ============================================================
+
 from flask import Flask, request, jsonify, render_template, send_from_directory, redirect, url_for
 from flask_cors import CORS
 import joblib
@@ -164,9 +170,10 @@ def predict():
 @app.route("/api/accuracy", methods=["GET"])
 def accuracy():
     return jsonify({
-        "Random Forest":        {"accuracy": 0.91, "f1": 0.89, "auc": 0.94, "precision": 0.88, "recall": 0.90},
-        "Decision Tree":        {"accuracy": 0.87, "f1": 0.83, "auc": 0.87, "precision": 0.84, "recall": 0.82},
-        "Logistic Regression":  {"accuracy": 0.82, "f1": 0.79, "auc": 0.86, "precision": 0.80, "recall": 0.78},
+        "Logistic Regression":  {"accuracy": 0.816, "f1": 0.79, "auc": 0.86, "precision": 0.80, "recall": 0.78},
+        "Decision Tree":        {"accuracy": 0.718, "f1": 0.70, "auc": 0.72, "precision": 0.68, "recall": 0.72},
+        "Random Forest":        {"accuracy": 0.803, "f1": 0.79, "auc": 0.87, "precision": 0.84, "recall": 0.80},
+        "KNN":                  {"accuracy": 0.767, "f1": 0.74, "auc": 0.79, "precision": 0.72, "recall": 0.76},
     })
 
 
